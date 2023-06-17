@@ -2,6 +2,7 @@ package com.arrowwould.covidtracker;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private List<CountryData> list;
+    String country = "India";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +41,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         list = new ArrayList<>();
+        if (getIntent().getStringExtra("country") != null)
+            country = getIntent().getStringExtra("country");
 
         init();
 
+        TextView cname = findViewById(R.id.cname);
+
+        cname.setText(country);
+
+        cname.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, CountryActivity.class)));
         ApiUtilities.getApiInterface().getCountryData().enqueue(new Callback<List<CountryData>>() {
             @Override
             public void onResponse(Call<List<CountryData>> call, Response<List<CountryData>> response) {
                 list.addAll(response.body());
 
                 for (int i = 0; i < list.size(); i++) {
-                    if (list.get(i).getCountry().equals("India")) {
+                    if (list.get(i).getCountry().equals("country")) {
                         int confirm = Integer.parseInt(list.get(i).getCases());
                         int active = Integer.parseInt(list.get(i).getActive());
                         int recoverd = Integer.parseInt(list.get(i).getRecovered());
